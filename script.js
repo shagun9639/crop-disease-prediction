@@ -62,6 +62,10 @@ imageInput.addEventListener("change",()=>{
 
     if(!file) return;
 
+    // Show file info
+    const fileSize = (file.size / 1024 / 1024).toFixed(2);
+    showToast(`📤 Image uploaded: ${file.name} (${fileSize}MB)`);
+
     const reader=new FileReader();
 
     reader.onload=function(e){
@@ -72,11 +76,41 @@ imageInput.addEventListener("change",()=>{
 
         previewImage.classList.add("fade");
 
+        // Show upload feedback card
+        showUploadFeedback(file.name);
+
     };
 
     reader.readAsDataURL(file);
 
 });
+
+// ==========================================
+// UPLOAD FEEDBACK CARD
+// ==========================================
+
+function showUploadFeedback(fileName) {
+    
+    let feedbackCard = document.getElementById("uploadFeedback");
+    
+    if (!feedbackCard) {
+        feedbackCard = document.createElement("div");
+        feedbackCard.id = "uploadFeedback";
+        feedbackCard.className = "upload-feedback fade";
+        document.querySelector(".glass").insertBefore(feedbackCard, document.querySelector(".loading"));
+    }
+    
+    feedbackCard.innerHTML = `
+        <div class="feedback-content">
+            <i class="fa-solid fa-check-circle"></i>
+            <h3>Image Ready for Analysis</h3>
+            <p>File: <strong>${fileName}</strong></p>
+            <p class="feedback-hint">Click "Predict Disease" to analyze the leaf</p>
+        </div>
+    `;
+    
+    feedbackCard.style.display = "block";
+}
 
 // ==========================================
 // DRAG & DROP
@@ -86,53 +120,60 @@ const dropArea=document.getElementById("dropArea");
 
 ["dragenter","dragover"].forEach(event=>{
 
-    dropArea.addEventListener(event,(e)=>{
+     dropArea.addEventListener(event,(e)=>{
 
-        e.preventDefault();
+         e.preventDefault();
 
-        dropArea.style.borderColor="#86efac";
+         dropArea.style.borderColor="#86efac";
 
-        dropArea.style.background="rgba(34,197,94,.18)";
+         dropArea.style.background="rgba(34,197,94,.18)";
 
-    });
+     });
 
 });
 
 ["dragleave","drop"].forEach(event=>{
 
-    dropArea.addEventListener(event,(e)=>{
+     dropArea.addEventListener(event,(e)=>{
 
-        e.preventDefault();
+         e.preventDefault();
 
-        dropArea.style.borderColor="#4ade80";
+         dropArea.style.borderColor="#4ade80";
 
-        dropArea.style.background="rgba(255,255,255,.05)";
+         dropArea.style.background="rgba(255,255,255,.05)";
 
-    });
+     });
 
 });
 
 dropArea.addEventListener("drop",(e)=>{
 
-    const files=e.dataTransfer.files;
+     const files=e.dataTransfer.files;
 
-    if(files.length){
+     if(files.length){
 
-        imageInput.files=files;
+         imageInput.files=files;
 
-        const reader=new FileReader();
+         const reader=new FileReader();
 
-        reader.onload=function(ev){
+         reader.onload=function(ev){
 
-            previewImage.src=ev.target.result;
+             previewImage.src=ev.target.result;
 
-            previewImage.style.display="block";
+             previewImage.style.display="block";
 
-        };
+             // Show file info
+             const fileSize = (files[0].size / 1024 / 1024).toFixed(2);
+             showToast(`📤 Image dropped: ${files[0].name} (${fileSize}MB)`);
 
-        reader.readAsDataURL(files[0]);
+             // Show upload feedback card
+             showUploadFeedback(files[0].name);
 
-    }
+         };
+
+         reader.readAsDataURL(files[0]);
+
+     }
 
 });
 
@@ -147,13 +188,13 @@ const diseaseInfo={
 
 "Cherry_(including_sour)___healthy":{
 
-    description:"The cherry plant is healthy and shows no visible signs of disease.",
+     description:"The cherry plant is healthy and shows no visible signs of disease.",
 
-    symptoms:"Leaves are green, fresh and free from fungal or bacterial infection.",
+     symptoms:"Leaves are green, fresh and free from fungal or bacterial infection.",
 
-    treatment:"No treatment is required.",
+     treatment:"No treatment is required.",
 
-    prevention:"Continue proper irrigation, balanced fertilization and regular monitoring."
+     prevention:"Continue proper irrigation, balanced fertilization and regular monitoring."
 
 },
 
@@ -226,41 +267,41 @@ prevention:"Maintain healthy farming practices."
 
 function saveHistory(item){
 
-    let history=JSON.parse(localStorage.getItem("history")) || [];
+     let history=JSON.parse(localStorage.getItem("history")) || [];
 
-    history.unshift(item);
+     history.unshift(item);
 
-    history=history.slice(0,5);
+     history=history.slice(0,5);
 
-    localStorage.setItem("history",JSON.stringify(history));
+     localStorage.setItem("history",JSON.stringify(history));
 
 }
 
 function updateHistoryCard(){
 
-    const history = JSON.parse(localStorage.getItem("history")) || [];
+     const history = JSON.parse(localStorage.getItem("history")) || [];
 
-    historyList.innerHTML = "";
+     historyList.innerHTML = "";
 
-    if(history.length===0){
+     if(history.length===0){
 
-        historyList.innerHTML =
-        `<li>No predictions yet.</li>`;
+         historyList.innerHTML =
+         `<li>No predictions yet.</li>`;
 
-        return;
+         return;
 
-    }
+     }
 
-    history.forEach((item,index)=>{
+     history.forEach((item,index)=>{
 
-        historyList.innerHTML += `
-        <li>
-            <strong>${index+1}.</strong>
-            🌿 ${item}
-        </li>
-        `;
+         historyList.innerHTML += `
+         <li>
+             <strong>${index+1}.</strong>
+             🌿 ${item}
+         </li>
+         `;
 
-    });
+     });
 
 }
 
@@ -270,153 +311,157 @@ function updateHistoryCard(){
 
 predictBtn.addEventListener("click", async () => {
 
-    const file = imageInput.files[0];
+     const file = imageInput.files[0];
 
-    if (!file) {
+     if (!file) {
 
-        showToast("⚠ Please select an image first.");
+         showToast("⚠ Please select an image first.");
 
-        return;
+         return;
 
-    }
+     }
 
-    startTime = performance.now();
+     startTime = performance.now();
 
-    loading.style.display = "block";
+     loading.style.display = "block";
 
-    resultCard.style.display = "none";
+     resultCard.style.display = "none";
 
-    predictBtn.disabled = true;
+     // Hide upload feedback when predicting
+     const feedbackCard = document.getElementById("uploadFeedback");
+     if (feedbackCard) feedbackCard.style.display = "none";
 
-    predictBtn.innerHTML =
-        `<i class="fa-solid fa-spinner fa-spin"></i> Predicting...`;
+     predictBtn.disabled = true;
 
-    const formData = new FormData();
+     predictBtn.innerHTML =
+         `<i class="fa-solid fa-spinner fa-spin"></i> Predicting...`;
 
-    formData.append("file", file);
+     const formData = new FormData();
 
-    try {
+     formData.append("file", file);
 
-        const response = await fetch("http://127.0.0.1:8000/predict", {
+     try {
 
-            method: "POST",
+         const response = await fetch("http://127.0.0.1:8000/predict", {
 
-            body: formData
+             method: "POST",
 
-        });
+             body: formData
 
-        if (!response.ok) {
+         });
 
-            throw new Error("Prediction Failed");
+         if (!response.ok) {
 
-        }
+             throw new Error("Prediction Failed");
 
-        const data = await response.json();
+         }
 
-        if (data.error) {
+         const data = await response.json();
 
-            throw new Error(data.error);
+         if (data.error) {
 
-        }
+             throw new Error(data.error);
 
-        loading.style.display = "none";
+         }
 
-        resultCard.style.display = "block";
+         loading.style.display = "none";
 
-        resultCard.classList.add("fade");
+         resultCard.style.display = "block";
 
-        predictBtn.disabled = false;
+         resultCard.classList.add("fade");
 
-        predictBtn.innerHTML =
-            `<i class="fa-solid fa-magnifying-glass"></i> Predict Disease`;
+         predictBtn.disabled = false;
 
-        // =====================================
-        // PREDICTION
-        // =====================================
+         predictBtn.innerHTML =
+             `<i class="fa-solid fa-magnifying-glass"></i> Predict Disease`;
 
-        prediction.innerHTML = data.prediction;
+         // =====================================
+         // PREDICTION
+         // =====================================
 
-        updateDiseaseInfo(data.prediction);
+         prediction.innerHTML = data.prediction;
 
-        // =====================================
-        // CONFIDENCE
-        // =====================================
+         updateDiseaseInfo(data.prediction);
 
-        let percent = data.confidence;
+         // =====================================
+         // CONFIDENCE
+         // =====================================
 
-        if (percent <= 1) {
+         let percent = data.confidence;
 
-            percent *= 100;
+         if (percent <= 1) {
 
-        }
+             percent *= 100;
 
-        percent = Number(percent.toFixed(2));
+         }
 
-        confidence.innerHTML = percent + "%";
+         percent = Number(percent.toFixed(2));
 
-        progressBar.style.width = percent + "%";
+         confidence.innerHTML = percent + "%";
 
-        progressBar.classList.remove("low", "medium", "high");
+         progressBar.style.width = percent + "%";
 
-        if (percent >= 90) {
+         progressBar.classList.remove("low", "medium", "high");
 
-            progressBar.classList.add("high");
+         if (percent >= 90) {
 
-            prediction.style.color = "#16a34a";
+             progressBar.classList.add("high");
 
-        }
+             prediction.style.color = "#16a34a";
 
-        else if (percent >= 70) {
+         }
 
-            progressBar.classList.add("medium");
+         else if (percent >= 70) {
 
-            prediction.style.color = "#eab308";
+             progressBar.classList.add("medium");
 
-        }
+             prediction.style.color = "#eab308";
 
-        else {
+         }
 
-            progressBar.classList.add("low");
+         else {
 
-            prediction.style.color = "#ef4444";
+             progressBar.classList.add("low");
 
-        }
+             prediction.style.color = "#ef4444";
 
-        // =====================================
-        // PREDICTION TIME
-        // =====================================
+         }
 
-        const endTime = performance.now();
+         // =====================================
+         // PREDICTION TIME
+         // =====================================
 
-        predictionTime.innerHTML =
-            ((endTime - startTime) / 1000).toFixed(2) + " sec";
+         const endTime = performance.now();
 
-        // =====================================
-        // SAVE HISTORY
-        // =====================================
+         predictionTime.innerHTML =
+             ((endTime - startTime) / 1000).toFixed(2) + " sec";
 
-        saveHistory(data.prediction);
+         // =====================================
+         // SAVE HISTORY
+         // =====================================
 
-        updateHistoryCard();
+         saveHistory(data.prediction);
 
-        showToast("✅ Prediction Completed");
+         updateHistoryCard();
 
-    }
+         showToast("✅ Prediction Completed");
 
-    catch (err) {
+     }
 
-        console.error(err);
+     catch (err) {
 
-        loading.style.display = "none";
+         console.error(err);
 
-        predictBtn.disabled = false;
+         loading.style.display = "none";
 
-        predictBtn.innerHTML =
-            `<i class="fa-solid fa-magnifying-glass"></i> Predict Disease`;
+         predictBtn.disabled = false;
 
-        showToast("❌ Backend not connected.");
+         predictBtn.innerHTML =
+             `<i class="fa-solid fa-magnifying-glass"></i> Predict Disease`;
 
-    }
+         showToast("❌ Backend not connected.");
+
+     }
 
 });
 
@@ -426,12 +471,12 @@ predictBtn.addEventListener("click", async () => {
 
 function updateDiseaseInfo(diseaseName){
 
-    const info = diseaseInfo[diseaseName] || diseaseInfo["default"];
+     const info = diseaseInfo[diseaseName] || diseaseInfo["default"];
 
-    description.innerHTML = info.description;
-    symptoms.innerHTML = info.symptoms;
-    treatment.innerHTML = info.treatment;
-    prevention.innerHTML = info.prevention;
+     description.innerHTML = info.description;
+     symptoms.innerHTML = info.symptoms;
+     treatment.innerHTML = info.treatment;
+     prevention.innerHTML = info.prevention;
 
 }
 
@@ -441,11 +486,11 @@ function updateDiseaseInfo(diseaseName){
 
 function clearHistory(){
 
-    localStorage.removeItem("history");
+     localStorage.removeItem("history");
 
-    updateHistoryCard();
+     updateHistoryCard();
 
-    showToast("🗑 History Cleared");
+     showToast("🗑 History Cleared");
 
 }
 
@@ -455,13 +500,16 @@ function clearHistory(){
 
 function resetResult(){
 
-    resultCard.style.display="none";
+     resultCard.style.display="none";
 
-    previewImage.src="";
+     previewImage.src="";
 
-    previewImage.style.display="none";
+     previewImage.style.display="none";
 
-    imageInput.value="";
+     imageInput.value="";
+
+     const feedbackCard = document.getElementById("uploadFeedback");
+     if (feedbackCard) feedbackCard.style.display = "none";
 
 }
 
@@ -471,9 +519,9 @@ function resetResult(){
 
 function copyPrediction(){
 
-    navigator.clipboard.writeText(prediction.innerText);
+     navigator.clipboard.writeText(prediction.innerText);
 
-    showToast("📋 Prediction Copied");
+     showToast("📋 Prediction Copied");
 
 }
 
@@ -483,7 +531,7 @@ function copyPrediction(){
 
 function downloadResult(){
 
-    const text =
+     const text =
 
 `Crop Disease Prediction
 
@@ -507,25 +555,25 @@ Prediction Time :
 ${predictionTime.innerText}
 `;
 
-    const blob = new Blob([text],{
+     const blob = new Blob([text],{
 
-        type:"text/plain"
+         type:"text/plain"
 
-    });
+     });
 
-    const url = URL.createObjectURL(blob);
+     const url = URL.createObjectURL(blob);
 
-    const a = document.createElement("a");
+     const a = document.createElement("a");
 
-    a.href=url;
+     a.href=url;
 
-    a.download="Prediction_Result.txt";
+     a.download="Prediction_Result.txt";
 
-    a.click();
+     a.click();
 
-    URL.revokeObjectURL(url);
+     URL.revokeObjectURL(url);
 
-    showToast("⬇ Report Downloaded");
+     showToast("⬇ Report Downloaded");
 
 }
 
@@ -535,11 +583,11 @@ ${predictionTime.innerText}
 
 document.addEventListener("keydown",(e)=>{
 
-    if(e.key==="Escape"){
+     if(e.key==="Escape"){
 
-        resetResult();
+         resetResult();
 
-    }
+     }
 
 });
 
