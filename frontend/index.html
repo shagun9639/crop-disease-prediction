@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Crop Disease Prediction Using Deep Learning</title>
+
+    <link rel="stylesheet" href="style.css">    
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+</head>
+
+<body>
+
+    <div class="background"></div>
+
+    <div class="container">
+
+        <div class="glass">
+
+            <div class="header">
+
+                <div class="logo">
+                    🌿
+                </div>
+
+                <h1>Crop Disease Prediction</h1>
+
+                <p class="subtitle">
+                    AI Powered Plant Disease Detection using Deep Learning
+                </p>
+
+            </div>
+
+            <div class="upload-box">
+
+                <input
+                    type="file"
+                    id="imageInput"
+                    accept="image/*"
+                    hidden>
+
+                <label id="dropArea" for="imageInput">
+
+                    <i class="fa-solid fa-cloud-arrow-up"></i>
+
+                    <h2>Upload Leaf Image</h2>
+
+                    <p>
+                        Drag & Drop or Click Here
+                    </p>
+
+                    <span>
+                        Supported :
+                        JPG • JPEG • PNG
+                    </span>
+
+                </label>
+
+            </div>
+
+            <div class="preview">
+
+                <img id="previewImage">
+
+            </div>
+
+            <button id="predictBtn">
+
+                <i class="fa-solid fa-magnifying-glass"></i>
+
+                Predict Disease
+
+            </button>
+
+            <div class="loading" id="loading">
+
+                <div class="spinner"></div>
+
+                <h3>Analyzing Leaf...</h3>
+
+                <p>
+                    AI is identifying the disease...
+                </p>
+
+            </div>
+
+            <div class="result-card" id="resultCard">
+
+                <div class="result-header">
+
+                    <i class="fa-solid fa-circle-check"></i>
+
+                    <h2>
+                        Prediction Result
+                    </h2>
+
+                </div>
+
+                <div class="result">
+
+                    <h3>Disease Name</h3>
+
+                    <p id="prediction">
+                        --
+                    </p>
+
+                </div>
+
+                <div class="confidence-section">
+
+                    <div class="confidence-title">
+
+                        <span>Confidence Score</span>
+
+                        <span id="confidence">
+                            0%
+                        </span>
+
+                    </div>
+
+                    <div class="progress">
+
+                        <div
+                            class="progress-bar"
+                            id="progressBar">
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="info-grid">
+
+                    <div class="info-box">
+
+                        <h3>
+
+                            <i class="fa-solid fa-circle-info"></i>
+
+                            Description
+
+                        </h3>
+
+                        <p id="description">
+
+                            Disease information will appear here.
+
+                        </p>
+
+                    </div>
+
+                    <div class="info-box">
+
+                        <h3>
+
+                            <i class="fa-solid fa-triangle-exclamation"></i>
+
+                            Symptoms
+
+                        </h3>
+
+                        <p id="symptoms">
+
+                            Symptoms will appear here.
+
+                        </p>
+
+                    </div>
+
+                    <div class="info-box">
+
+                        <h3>
+
+                            <i class="fa-solid fa-syringe"></i>
+
+                            Treatment
+
+                        </h3>
+
+                        <p id="treatment">
+
+                            Treatment recommendation will appear here.
+
+                        </p>
+
+                    </div>
+
+                    <div class="info-box">
+
+                        <h3>
+
+                            <i class="fa-solid fa-shield-heart"></i>
+
+                            Prevention
+
+                        </h3>
+
+                        <p id="prevention">
+
+                            Prevention tips will appear here.
+
+                        </p>
+
+                    </div>
+
+                </div>
+
+                <div class="extra-info">
+
+                    <div>
+
+                        ⏱ Prediction Time
+
+                        <strong id="predictionTime">
+
+                            0 sec
+
+                        </strong>
+
+                    </div>
+
+                    <div>
+
+                        🤖 Model
+
+                        <strong>
+
+                            TensorFlow CNN
+
+                        </strong>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="history-card">
+
+                <h2>
+
+                    <i class="fa-solid fa-clock-rotate-left"></i>
+
+                    Recent Predictions
+
+                </h2>
+
+                <ul id="historyList">
+
+                    <li>
+                        No predictions yet.
+                    </li>
+
+                </ul>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <script src="script.js"></script>
+
+</body>
+
+</html>
