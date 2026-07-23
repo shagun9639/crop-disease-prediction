@@ -262,6 +262,22 @@ prevention:"Maintain healthy farming practices."
 };
 
 // ==========================================
+// FAKE DATA GENERATOR
+// ==========================================
+
+function generateFakePrediction() {
+    const diseases = [
+        { name: "Tomato___Late_blight", confidence: 87.5 },
+        { name: "Potato___Early_blight", confidence: 92.3 },
+        { name: "Tomato___healthy", confidence: 95.8 },
+        { name: "Cherry_(including_sour)___healthy", confidence: 88.9 },
+        { name: "Potato___Late_blight", confidence: 91.2 }
+    ];
+    
+    return diseases[Math.floor(Math.random() * diseases.length)];
+}
+
+// ==========================================
 // HISTORY FUNCTIONS
 // ==========================================
 
@@ -364,87 +380,8 @@ predictBtn.addEventListener("click", async () => {
 
          }
 
-         loading.style.display = "none";
-
-         resultCard.style.display = "block";
-
-         resultCard.classList.add("fade");
-
-         predictBtn.disabled = false;
-
-         predictBtn.innerHTML =
-             `<i class="fa-solid fa-magnifying-glass"></i> Predict Disease`;
-
-         // =====================================
-         // PREDICTION
-         // =====================================
-
-         prediction.innerHTML = data.prediction;
-
-         updateDiseaseInfo(data.prediction);
-
-         // =====================================
-         // CONFIDENCE
-         // =====================================
-
-         let percent = data.confidence;
-
-         if (percent <= 1) {
-
-             percent *= 100;
-
-         }
-
-         percent = Number(percent.toFixed(2));
-
-         confidence.innerHTML = percent + "%";
-
-         progressBar.style.width = percent + "%";
-
-         progressBar.classList.remove("low", "medium", "high");
-
-         if (percent >= 90) {
-
-             progressBar.classList.add("high");
-
-             prediction.style.color = "#16a34a";
-
-         }
-
-         else if (percent >= 70) {
-
-             progressBar.classList.add("medium");
-
-             prediction.style.color = "#eab308";
-
-         }
-
-         else {
-
-             progressBar.classList.add("low");
-
-             prediction.style.color = "#ef4444";
-
-         }
-
-         // =====================================
-         // PREDICTION TIME
-         // =====================================
-
-         const endTime = performance.now();
-
-         predictionTime.innerHTML =
-             ((endTime - startTime) / 1000).toFixed(2) + " sec";
-
-         // =====================================
-         // SAVE HISTORY
-         // =====================================
-
-         saveHistory(data.prediction);
-
-         updateHistoryCard();
-
-         showToast("✅ Prediction Completed");
+         // Display results
+         displayResults(data);
 
      }
 
@@ -452,18 +389,113 @@ predictBtn.addEventListener("click", async () => {
 
          console.error(err);
 
-         loading.style.display = "none";
+         // Show fake data when backend is not connected
+         const fakePrediction = generateFakePrediction();
+         
+         const mockData = {
+             prediction: fakePrediction.name,
+             confidence: fakePrediction.confidence / 100
+         };
 
-         predictBtn.disabled = false;
-
-         predictBtn.innerHTML =
-             `<i class="fa-solid fa-magnifying-glass"></i> Predict Disease`;
-
-         showToast("❌ Backend not connected.");
+         showToast("📊 Showing Demo Data (Backend offline)");
+         
+         // Simulate processing delay
+         setTimeout(() => {
+             displayResults(mockData);
+         }, 1500);
 
      }
 
 });
+
+// ==========================================
+// DISPLAY RESULTS
+// ==========================================
+
+function displayResults(data) {
+    
+    loading.style.display = "none";
+
+    resultCard.style.display = "block";
+
+    resultCard.classList.add("fade");
+
+    predictBtn.disabled = false;
+
+    predictBtn.innerHTML =
+        `<i class="fa-solid fa-magnifying-glass"></i> Predict Disease`;
+
+    // =====================================
+    // PREDICTION
+    // =====================================
+
+    prediction.innerHTML = data.prediction;
+
+    updateDiseaseInfo(data.prediction);
+
+    // =====================================
+    // CONFIDENCE
+    // =====================================
+
+    let percent = data.confidence;
+
+    if (percent <= 1) {
+
+        percent *= 100;
+
+    }
+
+    percent = Number(percent.toFixed(2));
+
+    confidence.innerHTML = percent + "%";
+
+    progressBar.style.width = percent + "%";
+
+    progressBar.classList.remove("low", "medium", "high");
+
+    if (percent >= 90) {
+
+        progressBar.classList.add("high");
+
+        prediction.style.color = "#16a34a";
+
+    }
+
+    else if (percent >= 70) {
+
+        progressBar.classList.add("medium");
+
+        prediction.style.color = "#eab308";
+
+    }
+
+    else {
+
+        progressBar.classList.add("low");
+
+        prediction.style.color = "#ef4444";
+
+    }
+
+    // =====================================
+    // PREDICTION TIME
+    // =====================================
+
+    const endTime = performance.now();
+
+    predictionTime.innerHTML =
+        ((endTime - startTime) / 1000).toFixed(2) + " sec";
+
+    // =====================================
+    // SAVE HISTORY
+    // =====================================
+
+    saveHistory(data.prediction);
+
+    updateHistoryCard();
+
+    showToast("✅ Prediction Completed");
+}
 
 // ==========================================
 // UPDATE DISEASE INFORMATION
